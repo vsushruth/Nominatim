@@ -6,8 +6,33 @@ python:
   - "3.6"
 addons:
   postgresql: "9.6"
+  apt:
+    packages:
+      - libboost-dev
+      - libboost-system-dev
+      - libboost-filesystem-dev
+      - libexpat1-dev
+      - zlib1g-dev
+      - libxml2-dev
+      - libbz2-dev
+      - libpq-dev
+      - libgeos-c1
+      - libgeos++-dev
+      - libproj-dev
+      - postgresql-server-dev-9.6
+      - postgresql-9.6-postgis-2.3
+      - postgresql-contrib-9.6
+      - apache2
+      - php5
+      - php5-pgsql
+      - php5-intl
+      - php-pear
+      - python3-dev
+      - python3-pip
+      - python3-psycopg2
+      - php5-cgi
 git:
-  depth: 3
+  depth: 1
 env:
   - TEST_SUITE=tests
   - TEST_SUITE=monaco
