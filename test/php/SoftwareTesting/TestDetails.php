@@ -31,6 +31,25 @@ class TestDeletable extends \PHPUnit\Framework\TestCase
     }
 
     /** -------------------------------------------------------------------------------------------
+     * UT - 56
+     * Test getArraySQL() for correct return value
+     * 
+     * @dataProvider dbTestDataProvider
+     */
+    public function testGetArraySQL($oDB)
+    {
+        $this->assertEquals(
+            "ARRAY['a', 3, 7.1, 'X']",
+            $oDB->getArraySQL(['a', 3, 7.1, 'X'])
+        );
+
+        $this->assertEquals(
+            "ARRAY['Hello', 'World', 2077]",
+            $oDB->getArraySQL(['Hello', 'World', 2077])
+        );
+    }
+
+    /** -------------------------------------------------------------------------------------------
      * UT - 57
      * Test tableExists() for True/False
      * 
