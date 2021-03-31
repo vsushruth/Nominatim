@@ -54,6 +54,29 @@ class TestStatus extends \PHPUnit\Framework\TestCase
      * UT - 43
      * TESTING status() METHOD
      * 
+     * Testing for Module failed exception
+    */
+    public function testThrowModuleFailed()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Module failed');
+        $this->expectExceptionCode(701);
+
+        $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
+                        ->setMethods(array('connect', 'getOne'))
+                        ->getMock();
+
+        $oDbStub->method('getOne')
+                ->willReturn(false);
+
+        $oStatus = new Status($oDbStub);
+        $this->assertNull($oStatus->status());
+    }
+
+    /** ---------------------------------------------------------------------------------
+     * UT - 44
+     * TESTING status() METHOD
+     * 
      * Testing for Module call failed exception
     */
     public function testThrowModuleCallFailed()
@@ -70,13 +93,14 @@ class TestStatus extends \PHPUnit\Framework\TestCase
         $this->assertNull($oStatus->status());
     }
 
+    
     /** ---------------------------------------------------------------------------------
-     * UT - 44
+     * UT - 45
      * TESTING status() METHOD
      * 
      * Testing for Query Failed exception
     */
-    public function testWordIdQueryFail()
+    public function testNoValue()
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Query failed');
@@ -88,7 +112,7 @@ class TestStatus extends \PHPUnit\Framework\TestCase
 
         $oDbStub->method('getOne')
                 ->will($this->returnCallback(function ($sql) {
-                    return false;
+                    if (preg_match('/SELECT word_id, word_token/', $sql)) return false;
                 }));
 
         $oStatus = new Status($oDbStub);
@@ -96,12 +120,12 @@ class TestStatus extends \PHPUnit\Framework\TestCase
     }
 
     /** ---------------------------------------------------------------------------------
-     * UT - 45
+     * UT - 46
      * TESTING status() METHOD
      * 
      * Testing for No Value exception
     */
-    public function testNoValue()
+    public function testWordIdQueryFail()
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('No value');
@@ -122,7 +146,7 @@ class TestStatus extends \PHPUnit\Framework\TestCase
     }
 
     /** ---------------------------------------------------------------------------------
-     * UT - 46
+     * UT - 47
      * TESTING status() METHOD
      * 
      * Testing if correct status is returned
@@ -145,6 +169,8 @@ class TestStatus extends \PHPUnit\Framework\TestCase
 
 
 
+
+
     /** ---------------------------------------------------------------------------------
      * UT - 50
      * TESTING dataDate() METHOD
@@ -154,7 +180,6 @@ class TestStatus extends \PHPUnit\Framework\TestCase
     public function testDataDateException()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Data date query failed');
         $this->expectExceptionCode(705);
 
         $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
