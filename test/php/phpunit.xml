@@ -16,6 +16,9 @@
         <testsuite name="Nominatim PHP Test Suite">
             <directory>./Nominatim</directory>
         </testsuite>
+        <testsuite name="Nominatim PHP Test Suite by us">
+            <directory>./SoftwareTesting</directory>
+        </testsuite>
     </testsuites>
     <filter>
         <whitelist>

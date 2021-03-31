@@ -16,14 +16,36 @@ class NominatimSubClassedDB extends \Nominatim\DB
 class TestDeletable extends \PHPUnit\Framework\TestCase
 {
 
+    // $oDB = $this->dbTestDataProvider();
+    public function dbTestDataProvider() {
+        $unit_test_dsn = getenv('UNIT_TEST_DSN') != false ? getenv('UNIT_TEST_DSN') : 'pgsql:dbname=nominatim_unit_tests';
+
+        $aDSNParsed = \Nominatim\DB::parseDSN($unit_test_dsn);
+        $sDbname = $aDSNParsed['database'];
+        $aDSNParsed['database'] = 'postgres';
+
+        $oDB = new \Nominatim\DB(\Nominatim\DB::generateDSN($aDSNParsed));
+        $oDB->connect();
+        $oDB->exec('DROP DATABASE IF EXISTS ' . $sDbname);
+        $oDB->exec('CREATE DATABASE ' . $sDbname);
+
+        $oDB = new \Nominatim\DB($unit_test_dsn);
+        $oDB->connect();
+
+        $oDB->exec('CREATE TABLE table1 (id integer, firstName varchar, gender varchar)');
+        $oDB->exec("INSERT INTO table1 VALUES (1, 'Tom', 'Male'), (2, 'Mary', 'Female'), (3, 'Jacob', 'Male')");
+
+        return $oDB;
+    }
+
     /** -------------------------------------------------------------------------------------------
      * UT - 55
      * Test getDBQuoted() for correct return value
      * 
-     * @dataProvider dbTestDataProvider
      */
-    public function testGetDBQuoted($oDB)
+    public function testGetDBQuoted()
     {
+        $oDB = $this->dbTestDataProvider();
         $this->assertEquals(
             "'HelloWorld'",
             $oDB->getDBQuoted('HelloWorld')
@@ -34,10 +56,11 @@ class TestDeletable extends \PHPUnit\Framework\TestCase
      * UT - 56
      * Test getArraySQL() for correct return value
      * 
-     * @dataProvider dbTestDataProvider
      */
-    public function testGetArraySQL($oDB)
+    public function testGetArraySQL()
     {
+
+        $oDB = $this->dbTestDataProvider();
         $this->assertEquals(
             "ARRAY['a', 3, 7.1, 'X']",
             $oDB->getArraySQL(['a', 3, 7.1, 'X'])
@@ -192,24 +215,4 @@ class TestDeletable extends \PHPUnit\Framework\TestCase
 
 
 
-    public function dbTestDataProvider() {
-        $unit_test_dsn = getenv('UNIT_TEST_DSN') != false ? getenv('UNIT_TEST_DSN') : 'pgsql:dbname=nominatim_unit_tests';
-
-        $aDSNParsed = \Nominatim\DB::parseDSN($unit_test_dsn);
-        $sDbname = $aDSNParsed['database'];
-        $aDSNParsed['database'] = 'postgres';
-
-        $oDB = new \Nominatim\DB(\Nominatim\DB::generateDSN($aDSNParsed));
-        $oDB->connect();
-        $oDB->exec('DROP DATABASE IF EXISTS ' . $sDbname);
-        $oDB->exec('CREATE DATABASE ' . $sDbname);
-
-        $oDB = new \Nominatim\DB($unit_test_dsn);
-        $oDB->connect();
-
-        $oDB->exec('CREATE TABLE table1 (id integer, firstName varchar, gender varchar)');
-        $oDB->exec("INSERT INTO table1 VALUES (1, 'Tom', 'Male'), (2, 'Mary', 'Female'), (3, 'Jacob', 'Male')");
-
-        return $oDB;
-    }
 }
