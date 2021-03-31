@@ -103,8 +103,7 @@ class TestStatus extends \PHPUnit\Framework\TestCase
     public function testNoValue()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Query failed');
-        $this->expectExceptionCode(703);
+        $this->expectExceptionCode(702);
 
         $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
                         ->setMethods(array('connect', 'getOne'))
