@@ -5,6 +5,8 @@ namespace Nominatim;
 require_once(CONST_LibDir.'/ParameterParser.php');
 require_once(CONST_LibDir.'/lib.php');
 require_once(CONST_LibDir.'/DB.php');
+require_once(CONST_LibDir.'/PlaceLookup.php');
+require_once(CONST_LibDir.'/log.php');  
 
 
 function userError($sError)
@@ -202,6 +204,26 @@ class TestReverse extends \PHPUnit\Framework\TestCase
     }
 
 
+
+    /** ---------------------------------------------------------------------------------
+     * UT - 38
+     * TESTING lookupOSMID() METHOD
+     * 
+     * Testing for NULL Outputs
+    */
+    public function testlookupOSMID(){
+        $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
+                        ->setMethods(array('connect', 'getOne'))
+                        ->getMock();
+
+        $oDbStub->method('getOne')
+                ->willReturn(false);
+
+        $this->assertNull(lookupOSMID('', 0));
+
+    }
+    
+
     /** ---------------------------------------------------------------------------------
      * UT - 39 | UT - 40
      * TESTING getRow() METHOD
@@ -240,6 +262,67 @@ class TestReverse extends \PHPUnit\Framework\TestCase
             false,
             $oDB->getRow('SELECT * FROM table1 WHERE id=999')
         );
+    }
+
+
+
+    /** ---------------------------------------------------------------------------------
+     * UT - 34 | UT - 36
+     * TESTING LogStart() | LogEnd() METHOD
+     * 
+     * Testing for True/False Outputs
+    */
+    public function testLog()
+    {
+        $unit_test_dsn = getenv('UNIT_TEST_DSN') != false ? getenv('UNIT_TEST_DSN') : 'pgsql:dbname=nominatim_unit_tests';
+
+        $aDSNParsed = \Nominatim\DB::parseDSN($unit_test_dsn);
+        $sDbname = $aDSNParsed['database'];
+        $aDSNParsed['database'] = 'postgres';
+
+        $oDB = new \Nominatim\DB($unit_test_dsn);
+        $oDB->connect();
+        $oDB->exec('DROP DATABASE IF EXISTS ' . $sDbname);
+        $oDB->exec('CREATE DATABASE ' . $sDbname);
+
+        $oDB->exec('CREATE TABLE table1 (id integer, firstName varchar, gender varchar)');
+        $oDB->exec("INSERT INTO table1 VALUES (1, 'Tom', 'Male'), (2, 'Mary', 'Female'), (3, 'Jacob', 'Male')");
+
+        #UT-34
+        print(logStart($oDB));
+
+        #UT-36
+        print(logEnd($oDB));
+    }
+
+
+    /** ---------------------------------------------------------------------------------
+     * UT - 35 | UT - 37
+     * TESTING LogStart() | LogEnd() METHOD
+     * 
+     * Testing for True/False Outputs
+    */
+    public function testLogWithoutConnection()
+    {
+        $unit_test_dsn = getenv('UNIT_TEST_DSN') != false ? getenv('UNIT_TEST_DSN') : 'pgsql:dbname=nominatim_unit_tests';
+
+        $aDSNParsed = \Nominatim\DB::parseDSN($unit_test_dsn);
+        $sDbname = $aDSNParsed['database'];
+        $aDSNParsed['database'] = 'postgres';
+
+        $oDB = new \Nominatim\DB($unit_test_dsn);
+        // $oDB->connect();
+        // $oDB->exec('DROP DATABASE IF EXISTS ' . $sDbname);
+        // $oDB->exec('CREATE DATABASE ' . $sDbname);
+
+        // $oDB->exec('CREATE TABLE table1 (id integer, firstName varchar, gender varchar)');
+        // $oDB->exec("INSERT INTO table1 VALUES (1, 'Tom', 'Male'), (2, 'Mary', 'Female'), (3, 'Jacob', 'Male')");
+
+        #UT-35
+        print(logStart($oDB));
+
+        #UT-37
+        print(logEnd($oDB));
     }
 
 }

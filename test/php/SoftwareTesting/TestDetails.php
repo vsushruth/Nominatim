@@ -24,13 +24,10 @@ class TestDeletable extends \PHPUnit\Framework\TestCase
         $sDbname = $aDSNParsed['database'];
         $aDSNParsed['database'] = 'postgres';
 
-        $oDB = new \Nominatim\DB(\Nominatim\DB::generateDSN($aDSNParsed));
+        $oDB = new \Nominatim\DB($unit_test_dsn);
         $oDB->connect();
         $oDB->exec('DROP DATABASE IF EXISTS ' . $sDbname);
         $oDB->exec('CREATE DATABASE ' . $sDbname);
-
-        $oDB = new \Nominatim\DB($unit_test_dsn);
-        $oDB->connect();
 
         $oDB->exec('CREATE TABLE table1 (id integer, firstName varchar, gender varchar)');
         $oDB->exec("INSERT INTO table1 VALUES (1, 'Tom', 'Male'), (2, 'Mary', 'Female'), (3, 'Jacob', 'Male')");
