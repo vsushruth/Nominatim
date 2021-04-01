@@ -42,7 +42,7 @@ class TestLookup extends \PHPUnit\Framework\TestCase
      * UT - 77
      * Test getDefRadius() for invalid place type
      */
-    public function testGetDefRadius()
+    public function testInvalidGetDefRadius()
     {
         $aPlace = array('class' => 'Invalid', 'type' => 'Invalid');
         $this->assertEquals(0.00005, getDefRadius($aPlace));
