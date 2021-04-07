@@ -7,7 +7,7 @@ require_once(CONST_LibDir.'/lib.php');
 require_once(CONST_LibDir.'/DB.php');
 require_once(CONST_LibDir.'/PlaceLookup.php');
 require_once(CONST_LibDir.'/log.php');  
-
+require_once(CONST_LibDir.'/ReverseGeocode.php');
 
 function userError($sError)
 {
