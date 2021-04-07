@@ -15,19 +15,39 @@ class NominatimSubClassedDB extends \Nominatim\DB
 
 class TestDeletable extends \PHPUnit\Framework\TestCase
 {
+    public function __construct($aParams = null)
+    {
+        $this->oDB = $this->dbTestDataProvider();
+    }
+
+    
 
     // $oDB = $this->dbTestDataProvider();
     public function dbTestDataProvider() {
-        $unit_test_dsn = getenv('UNIT_TEST_DSN') != false ? getenv('UNIT_TEST_DSN') : 'pgsql:dbname=nominatim_unit_tests';
+        $unit_test_dsn = getenv('UNIT_TEST_DSN') != false ?
+                            getenv('UNIT_TEST_DSN') :
+                            'pgsql:dbname=nominatim_unit_tests';
 
-        $aDSNParsed = \Nominatim\DB::parseDSN($unit_test_dsn);
-        $sDbname = $aDSNParsed['database'];
-        $aDSNParsed['database'] = 'postgres';
+        $this->assertRegExp(
+            '/unit_test/',
+            $unit_test_dsn,
+            'Test database will get destroyed, thus should have a name like unit_test to be safe'
+        );
+
+        ## Create the database.
+        {
+            $aDSNParsed = \Nominatim\DB::parseDSN($unit_test_dsn);
+            $sDbname = $aDSNParsed['database'];
+            $aDSNParsed['database'] = 'postgres';
+
+            $oDB = new \Nominatim\DB(\Nominatim\DB::generateDSN($aDSNParsed));
+            $oDB->connect();
+            $oDB->exec('DROP DATABASE IF EXISTS ' . $sDbname);
+            $oDB->exec('CREATE DATABASE ' . $sDbname);
+        }
 
         $oDB = new \Nominatim\DB($unit_test_dsn);
         $oDB->connect();
-        $oDB->exec('DROP DATABASE IF EXISTS ' . $sDbname);
-        $oDB->exec('CREATE DATABASE ' . $sDbname);
 
         $oDB->exec('CREATE TABLE table1 (id integer, firstName varchar, gender varchar)');
         $oDB->exec("INSERT INTO table1 VALUES (1, 'Tom', 'Male'), (2, 'Mary', 'Female'), (3, 'Jacob', 'Male')");
@@ -42,10 +62,9 @@ class TestDeletable extends \PHPUnit\Framework\TestCase
      */
     public function testGetDBQuoted()
     {
-        $oDB = $this->dbTestDataProvider();
         $this->assertEquals(
             "'HelloWorld'",
-            $oDB->getDBQuoted('HelloWorld')
+            $this->$oDB->getDBQuoted('HelloWorld')
         );
     }
 
@@ -57,15 +76,15 @@ class TestDeletable extends \PHPUnit\Framework\TestCase
     public function testGetArraySQL()
     {
 
-        $oDB = $this->dbTestDataProvider();
+        // $oDB = $this->dbTestDataProvider();
         $this->assertEquals(
             "ARRAY['a', 3, 7.1, 'X']",
-            $oDB->getArraySQL(['a', 3, 7.1, 'X'])
+            $this->$oDB->getArraySQL(['a', 3, 7.1, 'X'])
         );
 
         $this->assertEquals(
             "ARRAY['Hello', 'World', 2077]",
-            $oDB->getArraySQL(['Hello', 'World', 2077])
+            $this->$oDB->getArraySQL(['Hello', 'World', 2077])
         );
     }
 
@@ -73,29 +92,27 @@ class TestDeletable extends \PHPUnit\Framework\TestCase
      * UT - 57
      * Test tableExists() for True/False
      * 
-     * @dataProvider dbTestDataProvider
      */
-    public function testTableExists($oDB){
-        $this->assertTrue($oDB->tableExists('table1'));
-        $this->assertFalse($oDB->tableExists('table99'));
-        $this->assertFalse($oDB->tableExists(null));
+    public function testTableExists(){
+        $this->assertTrue($this->$oDB->tableExists('table1'));
+        $this->assertFalse($this->$oDB->tableExists('table99'));
+        $this->assertFalse($this->$oDB->tableExists(null));
     }
 
     /** -------------------------------------------------------------------------------------------
      * UT - 58
      * Test getAssoc() for True condition
      * 
-     * @dataProvider dbTestDataProvider
      */
-    public function testGetAssocOk($oDB){
+    public function testGetAssocOk(){
         $this->assertEquals(
             array('Tom' => 'Male', 'Mary' => 'Female', 'Jacob' => 'Male'),
-            $oDB->getAssoc('SELECT firstName, gender FROM table1')
+            $this->$oDB->getAssoc('SELECT firstName, gender FROM table1')
         );
 
         $this->assertEquals(
             array(),
-            $oDB->getAssoc('SELECT firstName, gender FROM table1 WHERE id=999')
+            $this->$oDB->getAssoc('SELECT firstName, gender FROM table1 WHERE id=999')
         );
     }
 
@@ -104,31 +121,29 @@ class TestDeletable extends \PHPUnit\Framework\TestCase
      * UT - 59
      * Test getAssoc() for Exception
      * 
-     * @dataProvider dbTestDataProvider
      */
-    public function testGetAssocException($oDB){
+    public function testGetAssocException(){
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Database query failed');
         $this->expectExceptionCode(500);
 
-        $this->assertNull($oDB->getAssoc(' Hello '));
+        $this->assertNull($this->$oDB->getAssoc(' Hello '));
     }
 
     /** -------------------------------------------------------------------------------------------
      * UT - 60
      * Test getRow() for True condition
      * 
-     * @dataProvider dbTestDataProvider
      */
-    public function testGetRowOk($oDB){
+    public function testGetRowOk(){
         $this->assertEquals(
             array('id' => 1, 'firstName' => 'Tom', 'gender' => 'Male'),
-            $oDB->getRow('SELECT * FROM table1 WHERE id=1')
+            $this->$oDB->getRow('SELECT * FROM table1 WHERE id=1')
         );
 
         $this->assertEquals(
             false,
-            $oDB->getRow('SELECT * FROM table1 WHERE id=999')
+            $this->$oDB->getRow('SELECT * FROM table1 WHERE id=999')
         );
     }
 
@@ -136,14 +151,13 @@ class TestDeletable extends \PHPUnit\Framework\TestCase
      * UT - 61
      * Test getRow() for Exception
      * 
-     * @dataProvider dbTestDataProvider
      */
-    public function testGetRowException($oDB){
+    public function testGetRowException(){
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Database query failed');
         $this->expectExceptionCode(500);
 
-        $this->assertNull($oDB->getRow(' Hello '));
+        $this->assertNull($this->$oDB->getRow(' Hello '));
     }
 
 
@@ -151,16 +165,15 @@ class TestDeletable extends \PHPUnit\Framework\TestCase
      * UT - 62
      * Test getCol() for True condition
      * 
-     * @dataProvider dbTestDataProvider
      */
-    public function testGetColOk($oDB){
+    public function testGetColOk(){
         $this->assertEquals(
             array('Tom', 'Mary', 'Jacob'),
-            $oDB->getCol('SELECT firstName FROM table1')
+            $this->$oDB->getCol('SELECT firstName FROM table1')
         );
         $this->assertEquals(
             array(),
-            $oDB->getCol('SELECT firstName FROM table1 WHERE id=999')
+            $this->$oDB->getCol('SELECT firstName FROM table1 WHERE id=999')
         );
     }
 
@@ -168,14 +181,13 @@ class TestDeletable extends \PHPUnit\Framework\TestCase
      * UT - 63
      * Test getCol() for Exception
      * 
-     * @dataProvider dbTestDataProvider
      */
-    public function testGetColException($oDB){
+    public function testGetColException(){
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Database query failed');
         $this->expectExceptionCode(500);
 
-        $this->assertNull($oDB->getCol(' Hello '));
+        $this->assertNull($this->$oDB->getCol(' Hello '));
     }
 
 
@@ -183,16 +195,15 @@ class TestDeletable extends \PHPUnit\Framework\TestCase
      * UT - 64
      * Test getOne() for True condition
      * 
-     * @dataProvider dbTestDataProvider
      */
-    public function testGetOneOk($oDB){
+    public function testGetOneOk(){
         $this->assertEquals(
             'Jacob',
-            $oDB->getOne('SELECT firstName FROM table1 WHERE id=3')
+            $this->$oDB->getOne('SELECT firstName FROM table1 WHERE id=3')
         );
         $this->assertEquals(
             null,
-            $oDB->getOne('SELECT firstName FROM table1 WHERE id=999')
+            $this->$oDB->getOne('SELECT firstName FROM table1 WHERE id=999')
         );
     }
 
@@ -200,14 +211,13 @@ class TestDeletable extends \PHPUnit\Framework\TestCase
      * UT - 65
      * Test getOne() for Exception
      * 
-     * @dataProvider dbTestDataProvider
      */
-    public function testGetOneException($oDB){
+    public function testGetOneException(){
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Database query failed');
         $this->expectExceptionCode(500);
 
-        $this->assertNull($oDB->getOne(' Hello '));
+        $this->assertNull($this->$oDB->getOne(' Hello '));
     }
 
 

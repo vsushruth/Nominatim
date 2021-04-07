@@ -213,13 +213,14 @@ class TestReverse extends \PHPUnit\Framework\TestCase
     */
     public function testlookupOSMID(){
         $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
-                        ->setMethods(array('connect', 'getOne'))
-                        ->getMock();
+        ->setMethods(array('connect', 'getOne'))
+        ->getMock();
 
         $oDbStub->method('getOne')
-                ->willReturn(false);
+        ->willReturn(false);
+        $oLookUp = new PlaceLookup($oDbStub);
 
-        $this->assertNull(lookupOSMID('', 0));
+        $this->assertNull($oLookUp->lookupOSMID('', 0));
 
     }
     
@@ -232,21 +233,34 @@ class TestReverse extends \PHPUnit\Framework\TestCase
     */
     public function testgetRow()
     {
-        $unit_test_dsn = getenv('UNIT_TEST_DSN') != false ? getenv('UNIT_TEST_DSN') : 'pgsql:dbname=nominatim_unit_tests';
+        $unit_test_dsn = getenv('UNIT_TEST_DSN') != false ?
+                            getenv('UNIT_TEST_DSN') :
+                            'pgsql:dbname=nominatim_unit_tests';
 
-        $aDSNParsed = \Nominatim\DB::parseDSN($unit_test_dsn);
-        $sDbname = $aDSNParsed['database'];
-        $aDSNParsed['database'] = 'postgres';
+        $this->assertRegExp(
+            '/unit_test/',
+            $unit_test_dsn,
+            'Test database will get destroyed, thus should have a name like unit_test to be safe'
+        );
 
-        $oDB = new \Nominatim\DB(\Nominatim\DB::generateDSN($aDSNParsed));
-        $oDB->connect();
-        $oDB->exec('DROP DATABASE IF EXISTS ' . $sDbname);
-        $oDB->exec('CREATE DATABASE ' . $sDbname);
+        ## Create the database.
+        {
+            $aDSNParsed = \Nominatim\DB::parseDSN($unit_test_dsn);
+            $sDbname = $aDSNParsed['database'];
+            $aDSNParsed['database'] = 'postgres';
+
+            $oDB = new \Nominatim\DB(\Nominatim\DB::generateDSN($aDSNParsed));
+            $oDB->connect();
+            $oDB->exec('DROP DATABASE IF EXISTS ' . $sDbname);
+            $oDB->exec('CREATE DATABASE ' . $sDbname);
+        }
 
         $oDB = new \Nominatim\DB($unit_test_dsn);
         $oDB->connect();
-        $oDB->checkConnection($sDbname);
 
+        $this->assertTrue(
+            $oDB->checkConnection($sDbname)
+        );
         
         $oDB->exec('CREATE TABLE table1 (id integer, city varchar, country varchar)');
         $oDB->exec("INSERT INTO table1 VALUES (1, 'Berlin', 'Germany'), (2, 'Paris', 'France')");
@@ -274,19 +288,40 @@ class TestReverse extends \PHPUnit\Framework\TestCase
     */
     public function testLog()
     {
-        $unit_test_dsn = getenv('UNIT_TEST_DSN') != false ? getenv('UNIT_TEST_DSN') : 'pgsql:dbname=nominatim_unit_tests';
+        $unit_test_dsn = getenv('UNIT_TEST_DSN') != false ?
+                            getenv('UNIT_TEST_DSN') :
+                            'pgsql:dbname=nominatim_unit_tests';
 
-        $aDSNParsed = \Nominatim\DB::parseDSN($unit_test_dsn);
-        $sDbname = $aDSNParsed['database'];
-        $aDSNParsed['database'] = 'postgres';
+        $this->assertRegExp(
+            '/unit_test/',
+            $unit_test_dsn,
+            'Test database will get destroyed, thus should have a name like unit_test to be safe'
+        );
+
+        ## Create the database.
+        {
+            $aDSNParsed = \Nominatim\DB::parseDSN($unit_test_dsn);
+            $sDbname = $aDSNParsed['database'];
+            $aDSNParsed['database'] = 'postgres';
+
+            $oDB = new \Nominatim\DB(\Nominatim\DB::generateDSN($aDSNParsed));
+            $oDB->connect();
+            $oDB->exec('DROP DATABASE IF EXISTS ' . $sDbname);
+            $oDB->exec('CREATE DATABASE ' . $sDbname);
+        }
 
         $oDB = new \Nominatim\DB($unit_test_dsn);
         $oDB->connect();
-        $oDB->exec('DROP DATABASE IF EXISTS ' . $sDbname);
-        $oDB->exec('CREATE DATABASE ' . $sDbname);
 
-        $oDB->exec('CREATE TABLE table1 (id integer, firstName varchar, gender varchar)');
-        $oDB->exec("INSERT INTO table1 VALUES (1, 'Tom', 'Male'), (2, 'Mary', 'Female'), (3, 'Jacob', 'Male')");
+        $this->assertTrue(
+            $oDB->checkConnection($sDbname)
+        );
+        
+        $oDB->exec('CREATE TABLE table1 (id integer, city varchar, country varchar)');
+        $oDB->exec("INSERT INTO table1 VALUES (1, 'Berlin', 'Germany'), (2, 'Paris', 'France')");
+
+        // $oDB->exec('CREATE TABLE table1 (id integer, firstName varchar, gender varchar)');
+        // $oDB->exec("INSERT INTO table1 VALUES (1, 'Tom', 'Male'), (2, 'Mary', 'Female'), (3, 'Jacob', 'Male')");
 
         #UT-34
         print(logStart($oDB));
@@ -311,7 +346,7 @@ class TestReverse extends \PHPUnit\Framework\TestCase
         $aDSNParsed['database'] = 'postgres';
 
         $oDB = new \Nominatim\DB($unit_test_dsn);
-        // $oDB->connect();
+        $oDB->connect();
         // $oDB->exec('DROP DATABASE IF EXISTS ' . $sDbname);
         // $oDB->exec('CREATE DATABASE ' . $sDbname);
 

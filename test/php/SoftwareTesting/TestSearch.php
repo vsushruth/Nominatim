@@ -5,7 +5,12 @@ namespace Nominatim;
 require_once(CONST_LibDir.'/ParameterParser.php');
 require_once(CONST_LibDir.'/lib.php');
 require_once(CONST_LibDir.'/DB.php');
+require_once(CONST_LibDir.'/init-website.php');
 
+class UserException extends \Exception
+{
+    
+}
 
 function userError($sError)
 {
@@ -62,8 +67,57 @@ class TestReverse extends \PHPUnit\Framework\TestCase
 
     }
 
+    /** ---------------------------------------------------------------------------------
+     * UT - 6-7
+     * TESTING set_exception_handler_by_format() METHOD
+     * 
+    */
     public function test_set_exception_handler_by_format()
     {
+        set_exception_handler_by_format('json');
+        $this->expectException(\Exception::class);
+        throw new \Exception();
 
+        set_exception_handler_by_format('xml');
+        $this->expectException(\Exception::class);
+        throw new \Exception();
     }
+
+     /** ---------------------------------------------------------------------------------
+     * UT - 8-9
+     * TESTING getPreferredLanguages() METHOD
+     * 
+    */
+    public function testGetPreferredLanguages()
+    {
+        $oParams = new ParameterParser(array('accept-language' => ''));
+        $this->assertSame(array(
+                           'name:default' => 'name:default',
+                           'name' => 'name',
+                           'brand' => 'brand',
+                           'official_name:default' => 'official_name:default',
+                           'short_name:default' => 'short_name:default',
+                           'official_name' => 'official_name',
+                           'short_name' => 'short_name',
+                           'ref' => 'ref',
+                           'type' => 'type'
+                          ), $oParams->getPreferredLanguages('default'));
+
+        $oParams = new ParameterParser(array('accept-language' => 'de,en'));
+        $this->assertSame(array(
+                           'name:de' => 'name:de',
+                           'name:en' => 'name:en',
+                           'name' => 'name',
+                           'brand' => 'brand',
+                           'official_name:de' => 'official_name:de',
+                           'short_name:de' => 'short_name:de',
+                           'official_name:en' => 'official_name:en',
+                           'short_name:en' => 'short_name:en',
+                           'official_name' => 'official_name',
+                           'short_name' => 'short_name',
+                           'ref' => 'ref',
+                           'type' => 'type'
+                          ), $oParams->getPreferredLanguages('default'));
+    }
+
 }
