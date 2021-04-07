@@ -280,84 +280,19 @@ class TestReverse extends \PHPUnit\Framework\TestCase
 
 
 
-    /** ---------------------------------------------------------------------------------
-     * UT - 34 | UT - 36
-     * TESTING LogStart() | LogEnd() METHOD
-     * 
-     * Testing for True/False Outputs
-    */
-    public function testLog()
+    public function testLookupInCountry()
     {
-        $unit_test_dsn = getenv('UNIT_TEST_DSN') != false ?
-                            getenv('UNIT_TEST_DSN') :
-                            'pgsql:dbname=nominatim_unit_tests';
+        $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
+                        ->setMethods(array('connect', 'getOne'))
+                        ->getMock();
 
-        $this->assertRegExp(
-            '/unit_test/',
-            $unit_test_dsn,
-            'Test database will get destroyed, thus should have a name like unit_test to be safe'
-        );
+        $oDbStub->method('getOne')
+                ->willReturn(false);
 
-        ## Create the database.
-        {
-            $aDSNParsed = \Nominatim\DB::parseDSN($unit_test_dsn);
-            $sDbname = $aDSNParsed['database'];
-            $aDSNParsed['database'] = 'postgres';
+        $oRevGeocode = new ReverseGeocode($oDbStub);
 
-            $oDB = new \Nominatim\DB(\Nominatim\DB::generateDSN($aDSNParsed));
-            $oDB->connect();
-            $oDB->exec('DROP DATABASE IF EXISTS ' . $sDbname);
-            $oDB->exec('CREATE DATABASE ' . $sDbname);
-        }
+        $this->assertNull($oRevGeocode->lookupInCountry(1));
 
-        $oDB = new \Nominatim\DB($unit_test_dsn);
-        $oDB->connect();
-
-        $this->assertTrue(
-            $oDB->checkConnection($sDbname)
-        );
-        
-        $oDB->exec('CREATE TABLE table1 (id integer, city varchar, country varchar)');
-        $oDB->exec("INSERT INTO table1 VALUES (1, 'Berlin', 'Germany'), (2, 'Paris', 'France')");
-
-        // $oDB->exec('CREATE TABLE table1 (id integer, firstName varchar, gender varchar)');
-        // $oDB->exec("INSERT INTO table1 VALUES (1, 'Tom', 'Male'), (2, 'Mary', 'Female'), (3, 'Jacob', 'Male')");
-
-        #UT-34
-        print(logStart($oDB));
-
-        #UT-36
-        print(logEnd($oDB));
-    }
-
-
-    /** ---------------------------------------------------------------------------------
-     * UT - 35 | UT - 37
-     * TESTING LogStart() | LogEnd() METHOD
-     * 
-     * Testing for True/False Outputs
-    */
-    public function testLogWithoutConnection()
-    {
-        $unit_test_dsn = getenv('UNIT_TEST_DSN') != false ? getenv('UNIT_TEST_DSN') : 'pgsql:dbname=nominatim_unit_tests';
-
-        $aDSNParsed = \Nominatim\DB::parseDSN($unit_test_dsn);
-        $sDbname = $aDSNParsed['database'];
-        $aDSNParsed['database'] = 'postgres';
-
-        $oDB = new \Nominatim\DB($unit_test_dsn);
-        $oDB->connect();
-        // $oDB->exec('DROP DATABASE IF EXISTS ' . $sDbname);
-        // $oDB->exec('CREATE DATABASE ' . $sDbname);
-
-        // $oDB->exec('CREATE TABLE table1 (id integer, firstName varchar, gender varchar)');
-        // $oDB->exec("INSERT INTO table1 VALUES (1, 'Tom', 'Male'), (2, 'Mary', 'Female'), (3, 'Jacob', 'Male')");
-
-        #UT-35
-        print(logStart($oDB));
-
-        #UT-37
-        print(logEnd($oDB));
     }
 
 }
