@@ -6,8 +6,11 @@ require_once(CONST_LibDir.'/ParameterParser.php');
 require_once(CONST_LibDir.'/lib.php');
 require_once(CONST_LibDir.'/DB.php');
 require_once(CONST_LibDir.'/PlaceLookup.php');
-require_once(CONST_LibDir.'/log.php');  
 require_once(CONST_LibDir.'/ReverseGeocode.php');
+
+
+require_once(CONST_LibDir.'/DebugHtml.php');
+require_once(CONST_LibDir.'/Result.php');
 
 function userError($sError)
 {
@@ -280,13 +283,18 @@ class TestReverse extends \PHPUnit\Framework\TestCase
 
 
 
+    /** ---------------------------------------------------------------------------------
+     * 
+     */
     public function testLookupOne()
     {
         $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
                         ->setMethods(array('connect', 'getOne', 'getRow'))
                         ->getMock();
+
         $oDbStub->method('getOne')
                 ->willReturn(false);
+
         $oDbStub->method('getRow')
                 ->willReturn(false);
 
@@ -296,7 +304,46 @@ class TestReverse extends \PHPUnit\Framework\TestCase
 
     }
 
+
+    /** ---------------------------------------------------------------------------------
+     * 
+     */
     public function testLookupTwo()
+    {
+        $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
+                        ->setMethods(array('connect', 'getOne', 'getRow'))
+                        ->getMock();
+
+        $aPlace = array(
+            'parent_place_id' => 123123,
+            'rank_address' => 28,
+            'rank_search' => 12,
+            'place_id'=> 155814
+        );
+        $oResult = new Result($aPlace['place_id']);
+        
+        $oDbStub->method('getOne')
+                ->willReturn(true);
+
+        $oDbStub->method('getRow')
+                ->will($this->returnCallback(function ($sql) {
+                    if (preg_match('/and \(name is not null or housenumber is not null/', $sql)) return false;
+                    if (preg_match("/WHERE ST_GeometryType(geometry) in (\'ST_Polygon\', \'ST_MultiPolygon\')/", $sql)) return false;
+                    if (preg_match("/WHERE distance <= reverse_place_diameter(rank_search)/", $sql)) return $aPlace;
+                }));
+
+        $oRevGeocode = new ReverseGeocode($oDbStub);
+
+        $this->assertEquals($oResult, $oRevGeocode->lookup(1, 1, false));
+
+    }
+
+
+
+    /** ---------------------------------------------------------------------------------
+     * 
+     */
+    public function testLookupThree()
     {
         $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
                         ->setMethods(array('connect', 'getOne', 'getRow'))
@@ -308,18 +355,129 @@ class TestReverse extends \PHPUnit\Framework\TestCase
             'rank_search' => 12,
             'place_id'=> 155814
         );
+        $oResult = new Result($aPoly['place_id']);
+
+        $oDbStub->method('getRow')
+                ->will($this->returnCallback(function ($sql) {
+                    if (preg_match("/WHERE ST_GeometryType(geometry) in (\'ST_Polygon\', \'ST_MultiPolygon\')/", $sql)) return $aPoly;
+                    if (preg_match('/and \(name is not null or housenumber is not null/', $sql)) return false;
+                }));
+
+        $oRevGeocode = new ReverseGeocode($oDbStub);
+
+        $this->assertEquals($oResult, $oRevGeocode->lookup(1, 1, false));
+
+    }
+
+
+    /** ---------------------------------------------------------------------------------
+     * 
+     */
+    public function testLookupFour()
+    {
+        $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
+                        ->setMethods(array('connect', 'getOne', 'getRow'))
+                        ->getMock();
+
+        $aPoly = array(
+            'parent_place_id' => 123123,
+            'rank_address' => 20,
+            'rank_search' => 12,
+            'place_id'=> 155814
+        );
+        $aPlaceNode = array(
+            'parent_place_id' => 134573,
+            'rank_address' => 20,
+            'rank_search' => 12,
+            'place_id'=> 856630
+        );
+        $oResult = new Result(856630);
+        
+
+        $oDbStub->method('getRow')
+                ->will($this->returnCallback(function ($sql) {
+                    if (preg_match("/AND rank_address Between 5 AND 25/", $sql)) return $aPoly;
+                    if (preg_match("/AND rank_address > 0/", $sql)) return $aPlaceNode;
+                    if (preg_match('/or rank_address between 26 and 27/', $sql)) return false;
+                }));
+
+        $oRevGeocode = new ReverseGeocode($oDbStub);
+
+        $this->assertEquals($oResult, $oRevGeocode->lookup(1, 1, false));
+
+    }
+
+
+    /** ---------------------------------------------------------------------------------
+     * 
+     */
+    public function testLookupFive()
+    {
+        $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
+                        ->setMethods(array('connect', 'getOne', 'getRow'))
+                        ->getMock();
+
+        $aPlace = array(
+            'parent_place_id' => 123123,
+            'rank_address' => 30,
+            'rank_search' => 12,
+            'place_id'=> 155814
+        );
+        $oResult = new Result(155814);
+
         $oDbStub->method('getOne')
                 ->willReturn(false);
 
         $oDbStub->method('getRow')
                 ->will($this->returnCallback(function ($sql) {
-                    if (preg_match("/WHERE ST_GeometryType(geometry) in (\'ST_Polygon\', \'ST_MultiPolygon\')/", $sql)) return $$aPoly;
-                    if (preg_match('/and (name is not null or housenumber is not null/', $sql)) return false;
+                    if (preg_match("/or rank_address between 26 and 27/", $sql)) return $aPlace;
                 }));
 
         $oRevGeocode = new ReverseGeocode($oDbStub);
 
-        $this->assertNull($oRevGeocode->lookup(1, 1, false));
+        $this->assertEquals($oResult, $oRevGeocode->lookup(1, 1, false));
+
+    }
+
+
+    
+    /** ---------------------------------------------------------------------------------
+     * 
+     */
+    public function testLookupSix()
+    {
+        $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
+                        ->setMethods(array('connect', 'getOne', 'getRow'))
+                        ->getMock();
+
+        $aPlace = array(
+            'parent_place_id' => 123123,
+            'rank_address' => 20,
+            'rank_search' => 12,
+            'place_id'=> 155814,
+            'country_code' => "ind"
+        );
+        $aStreet = array(
+            'parent_place_id' => 123123,
+            'rank_address' => 20,
+            'rank_search' => 12,
+            'place_id'=> 253814,
+            'country_code' => "ind"
+        );
+        $oResult = new Result(253814);
+
+        $oDbStub->method('getOne')
+                ->willReturn(false);
+
+        $oDbStub->method('getRow')
+                ->will($this->returnCallback(function ($sql) {
+                    if (preg_match("/or rank_address between 26 and 27/", $sql)) return $aPlace;
+                    if (preg_match('/and rank_address > 28/', $sql)) return $aStreet;
+                }));
+
+        $oRevGeocode = new ReverseGeocode($oDbStub);
+
+        $this->assertEquals($oResult, $oRevGeocode->lookup(1, 1, false));
 
     }
 
