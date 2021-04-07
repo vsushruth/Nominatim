@@ -280,20 +280,50 @@ class TestReverse extends \PHPUnit\Framework\TestCase
 
 
 
-    public function testLookupInCountry()
+    public function testLookupOne()
     {
         $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
-                        ->setMethods(array('connect', 'getOne'))
+                        ->setMethods(array('connect', 'getOne', 'getRow'))
                         ->getMock();
-
         $oDbStub->method('getOne')
+                ->willReturn(false);
+        $oDbStub->method('getRow')
                 ->willReturn(false);
 
         $oRevGeocode = new ReverseGeocode($oDbStub);
 
-        $this->assertNull($oRevGeocode->lookupInCountry(1));
+        $this->assertNull($oRevGeocode->lookup(1, 1, false));
 
     }
+
+    public function testLookupTwo()
+    {
+        $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
+                        ->setMethods(array('connect', 'getOne', 'getRow'))
+                        ->getMock();
+
+        $aPoly = array(
+            'parent_place_id' => 123123,
+            'rank_address' => 28,
+            'rank_search' => 12,
+            'place_id'=> 155814
+        );
+        $oDbStub->method('getOne')
+                ->willReturn(false);
+
+        $oDbStub->method('getRow')
+                ->will($this->returnCallback(function ($sql) {
+                    if (preg_match("/WHERE ST_GeometryType(geometry) in (\'ST_Polygon\', \'ST_MultiPolygon\')/", $sql)) return $$aPoly;
+                    if (preg_match('/and (name is not null or housenumber is not null/', $sql)) return false;
+                }));
+
+        $oRevGeocode = new ReverseGeocode($oDbStub);
+
+        $this->assertNull($oRevGeocode->lookup(1, 1, false));
+
+    }
+
+
 
 }
 
