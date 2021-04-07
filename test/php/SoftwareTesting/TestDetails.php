@@ -229,7 +229,7 @@ class TestDeletable extends \PHPUnit\Framework\TestCase
         $oDB->exec("INSERT INTO table1 VALUES (1, 'Tom', 'Male'), (2, 'Mary', 'Female'), (3, 'Jacob', 'Male')");
 
         
-        $this->assertNull($this->$oDB->getOne(' Hello '));
+        $this->assertNull($oDB->getOne('Hello'));
     }
 }
 
