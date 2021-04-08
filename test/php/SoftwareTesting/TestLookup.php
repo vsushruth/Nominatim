@@ -1,5 +1,5 @@
 <?php
-
+// 8 UT 70-77
 namespace Nominatim;
 
 require_once(CONST_LibDir.'/ClassTypes.php');
@@ -50,7 +50,7 @@ class TestLookup extends \PHPUnit\Framework\TestCase
     }
 
     /** -------------------------------------------------------------------------------------------
-     * UT - 77
+     * UT - 71-75
      * Test getDefRadius() for invalid place type
      */
     public function testGetOutlines()
@@ -81,17 +81,22 @@ class TestLookup extends \PHPUnit\Framework\TestCase
                     '3' => 0.3885547
                 )
         );
+
+        $map = [["select place_id,0 as numfeatures,st_area(geometry) as area, ST_Y(centroid) as centrelat, ST_X(centroid) as centrelon, ST_YMin(geometry) as minlat,ST_YMax(geometry) as maxlat, ST_XMin(geometry) as minlon,ST_XMax(geometry) as maxlon from placex where place_id = 155814", null, 'Could not get outline', $aPlace],["select place_id,0 as numfeatures,st_area(geometry) as area, ST_Y(centroid) as centrelat, ST_X(centroid) as centrelon, ST_YMin(geometry) as minlat,ST_YMax(geometry) as maxlat, ST_XMin(geometry) as minlon,ST_XMax(geometry) as maxlon from placex where place_id = 0", null, 'Could not get outline', array()]];
         $oDbStub->method('getRow')
-        ->willReturn($aPlace);
+        ->will($this->returnValueMap($map));
         
         $oPL = new PlaceLookup($oDbStub);
+        // * UT - 71
         $this->assertEquals($aOutline, $oPL->getOutlines('155814'));
-        // $this->assertEmpty($oPL->getOutlines('1', 1));
-        // $this->assertEmpty($oPL->getOutlines('1'));
-        // $this->assertEmpty($oPL->getOutlines('1'));
-        // $this->assertEmpty($oPL->getOutlines('1'));
+        // * UT - 72
+        $this->assertEquals($aOutline, $oPL->getOutlines('155814', $fRadius=0));
+        // * UT - 73
+        $this->assertEquals($aOutline, $oPL->getOutlines('155814', $fLat=51, $fLon=0));
+        // * UT - 74
+        $this->assertEquals($aOutline, $oPL->getOutlines('155814', $fLatReverse=51, $fLonReverse=0));
+        // * UT - 75
+        $this->assertEmpty($oPL->getOutlines('0'));
     }
-    // place_id | numfeatures | area | centrelat  | centrelon |   minlat   |   maxlat   |  minlon   |  maxlon   
-    // ----------+-------------+------+------------+-----------+------------+------------+-----------+-----------
-    //    155814 |           0 |    0 | 51.0791006 | 0.3878748 | 51.0788777 | 51.0794884 | 0.3869586 | 0.3885547
+
 }

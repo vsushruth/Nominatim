@@ -1,5 +1,5 @@
 <?php
-
+// 3
 namespace Nominatim;
 
 require_once(CONST_LibDir.'/lib.php');

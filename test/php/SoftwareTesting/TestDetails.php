@@ -1,5 +1,5 @@
 <?php
-
+// 11 + 1 BDD
 namespace Nominatim;
 
 require_once(CONST_LibDir.'/lib.php');
