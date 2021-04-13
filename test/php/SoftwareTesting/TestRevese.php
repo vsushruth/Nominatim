@@ -20,7 +20,7 @@ function userError($sError)
 class TestReverse extends \PHPUnit\Framework\TestCase
 {
     /** ---------------------------------------------------------------------------------
-     * UT - 24
+     * UT - 15
      * TESTING getSet() METHOD
      * 
      * Testing for True/False Outputs
@@ -42,7 +42,7 @@ class TestReverse extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * UT - 25
+     * UT - 16
      * Testing For Exceptions
      */
     public function testGetSetWithValueNotInSet()
@@ -54,7 +54,7 @@ class TestReverse extends \PHPUnit\Framework\TestCase
     }
 
     /** ---------------------------------------------------------------------------------
-     * UT - 26
+     * UT - 17
      * TESTING getBool() METHOD
      * 
      * Testing for True Outputs
@@ -75,7 +75,7 @@ class TestReverse extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * UT - 27
+     * UT - 18
      * Testing For Exceptions
      */
     public function testGetBoolFalse()
@@ -93,7 +93,7 @@ class TestReverse extends \PHPUnit\Framework\TestCase
 
 
     /** ---------------------------------------------------------------------------------
-     * UT - 28
+     * UT - 19
      * TESTING getInt() METHOD
      * 
      * Testing for True/False Outputs
@@ -115,7 +115,7 @@ class TestReverse extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * UT - 29
+     * UT - 20
      * Testing For Exceptions
      */
     public function testGetIntWithNonNumber()
@@ -139,7 +139,7 @@ class TestReverse extends \PHPUnit\Framework\TestCase
 
 
     /** ---------------------------------------------------------------------------------
-     * UT - 30
+     * UT - 21
      * TESTING getFloat() METHOD
      * 
      * Testing for True/False Outputs
@@ -161,7 +161,7 @@ class TestReverse extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * UT - 31
+     * UT - 22
      * Testing For Exceptions
      */
     public function testGetFloatWithEmptyString()
@@ -185,7 +185,7 @@ class TestReverse extends \PHPUnit\Framework\TestCase
 
 
     /** ---------------------------------------------------------------------------------
-     * UT - 32 | UT - 33
+     * UT - 23 | UT - 24
      * TESTING getString() METHOD
      * 
      * Testing for True/False Outputs
@@ -209,7 +209,7 @@ class TestReverse extends \PHPUnit\Framework\TestCase
 
 
     /** ---------------------------------------------------------------------------------
-     * UT - 38
+     * UT - 31
      * TESTING lookupOSMID() METHOD
      * 
      * Testing for NULL Outputs
@@ -229,7 +229,7 @@ class TestReverse extends \PHPUnit\Framework\TestCase
     
 
     /** ---------------------------------------------------------------------------------
-     * UT - 39 | UT - 40
+     * UT - 32 | UT - 33
      * TESTING getRow() METHOD
      * 
      * Testing for True/False Outputs
@@ -283,9 +283,12 @@ class TestReverse extends \PHPUnit\Framework\TestCase
 
 
 
-    /** ---------------------------------------------------------------------------------
-     * 
-     */
+    /* ---------------------------------------------------------------------------------
+    * UT - 25
+    * TESTING lookup() METHOD
+    * 
+    * Testing for place that does not exist
+    */
     public function testLookupOne()
     {
         $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
@@ -305,9 +308,12 @@ class TestReverse extends \PHPUnit\Framework\TestCase
     }
 
 
-    /** ---------------------------------------------------------------------------------
-     * 
-     */
+    /* ---------------------------------------------------------------------------------
+    * UT - 26
+    * TESTING lookup() METHOD
+    * 
+    * Testing for input place does not exist in a given area, but exists in a larger area polygon.
+    */
     public function testLookupTwo()
     {
         $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
@@ -340,9 +346,12 @@ class TestReverse extends \PHPUnit\Framework\TestCase
 
 
 
-    /** ---------------------------------------------------------------------------------
-     * 
-     */
+    /* ---------------------------------------------------------------------------------
+    * UT - 27
+    * TESTING lookup() METHOD
+    * 
+    * Testing for place does not exist in a given area,or in a larger area polygon or country.
+    */
     public function testLookupThree()
     {
         $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
@@ -370,9 +379,12 @@ class TestReverse extends \PHPUnit\Framework\TestCase
     }
 
 
-    /** ---------------------------------------------------------------------------------
-     * 
-     */
+    /* ---------------------------------------------------------------------------------
+    * UT - 28
+    * TESTING lookup() METHOD
+    * 
+    * Testing for place does not exist in a given area, but exists in a country.
+    */
     public function testLookupFour()
     {
         $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
@@ -408,9 +420,12 @@ class TestReverse extends \PHPUnit\Framework\TestCase
     }
 
 
-    /** ---------------------------------------------------------------------------------
-     * 
-     */
+    /* ---------------------------------------------------------------------------------
+    * UT - 29
+    * TESTING lookup() METHOD
+    * 
+    * Testing for place exists in a given area.
+    */
     public function testLookupFive()
     {
         $oDbStub = $this->getMockBuilder(Nominatim\DB::class)
@@ -441,9 +456,12 @@ class TestReverse extends \PHPUnit\Framework\TestCase
 
 
     
-    /** ---------------------------------------------------------------------------------
-     * 
-     */
+    /* ---------------------------------------------------------------------------------
+    * UT - 30
+    * TESTING lookup() METHOD
+    * 
+    * Testing for place exists in a given area, but has lower rank than the max rank.
+    */
     public function testLookupSix()
     {
         $oDbStub = $this->getMockBuilder(Nominatim\DB::class)

@@ -16,7 +16,7 @@ class NominatimSubClassedDB extends \Nominatim\DB
 class TestDeletable extends \PHPUnit\Framework\TestCase
 {
     /** ---------------------------------------------------------------------------------
-     * UT - 67 | UT - 68 
+     * UT - 58 | UT - 59 
      * TESTING status() METHOD
      * 
      * Testing for Empty array or array of results
@@ -55,7 +55,7 @@ class TestDeletable extends \PHPUnit\Framework\TestCase
     }
 
     /** ---------------------------------------------------------------------------------
-     * UT - 69
+     * UT - 60
      * TESTING status() METHOD
      * 
      * Testing for Exception

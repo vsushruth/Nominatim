@@ -17,7 +17,7 @@ class NominatimSubClassedDB extends \Nominatim\DB
 class TestLookup extends \PHPUnit\Framework\TestCase
 {
     /** -------------------------------------------------------------------------------------------
-     * UT - 70
+     * UT - 61
      * Test userError() for correct return value
      */
     public function testUserError()
@@ -30,7 +30,7 @@ class TestLookup extends \PHPUnit\Framework\TestCase
     }
 
     /** -------------------------------------------------------------------------------------------
-     * UT - 76
+     * UT - 67
      * Test getDefRadius() for 'village' type
      */
     public function testGetDefRadius()
@@ -40,7 +40,7 @@ class TestLookup extends \PHPUnit\Framework\TestCase
     }
 
     /** -------------------------------------------------------------------------------------------
-     * UT - 77
+     * UT - 68
      * Test getDefRadius() for invalid place type
      */
     public function testInvalidGetDefRadius()
@@ -50,7 +50,7 @@ class TestLookup extends \PHPUnit\Framework\TestCase
     }
 
     /** -------------------------------------------------------------------------------------------
-     * UT - 71-75
+     * UT - 62 | UT - 66
      * Test getDefRadius() for invalid place type
      */
     public function testGetOutlines()
@@ -87,15 +87,19 @@ class TestLookup extends \PHPUnit\Framework\TestCase
         ->will($this->returnValueMap($map));
         
         $oPL = new PlaceLookup($oDbStub);
-        // * UT - 71
+        // UT - 62
         $this->assertEquals($aOutline, $oPL->getOutlines('155814'));
-        // * UT - 72
+
+        // UT - 63
         $this->assertEquals($aOutline, $oPL->getOutlines('155814', $fRadius=0));
-        // * UT - 73
+
+        // UT - 64
         $this->assertEquals($aOutline, $oPL->getOutlines('155814', $fLat=51, $fLon=0));
-        // * UT - 74
+
+        // UT - 65
         $this->assertEquals($aOutline, $oPL->getOutlines('155814', $fLatReverse=51, $fLonReverse=0));
-        // * UT - 75
+        
+        // UT - 66
         $this->assertEmpty($oPL->getOutlines('0'));
     }
 

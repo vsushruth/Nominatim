@@ -16,17 +16,8 @@ class NominatimSubClassedDB extends \Nominatim\DB
 class TestDetails extends \PHPUnit\Framework\TestCase
 {
     public function testdbTestDataProvider() {
-        $unit_test_dsn = getenv('UNIT_TEST_DSN') != false ?
-                            getenv('UNIT_TEST_DSN') :
-                            'pgsql:dbname=nominatim_unit_tests';
+        $unit_test_dsn = getenv('UNIT_TEST_DSN') != false ? getenv('UNIT_TEST_DSN') : 'pgsql:dbname=nominatim_unit_tests';
 
-        // $this->assertRegExp(
-        //     '/unit_test/',
-        //     $unit_test_dsn,
-        //     'Test database will get destroyed, thus should have a name like unit_test to be safe'
-        // );
-
-        ## Create the database.
         {
             $aDSNParsed = \Nominatim\DB::parseDSN($unit_test_dsn);
             $sDbname = $aDSNParsed['database'];
@@ -45,7 +36,7 @@ class TestDetails extends \PHPUnit\Framework\TestCase
         $oDB->exec("INSERT INTO table1 VALUES (1, 'Tom', 'Male'), (2, 'Mary', 'Female'), (3, 'Jacob', 'Male')");
 
         /** -------------------------------------------------------------------------------------------
-         * UT - 55
+         * UT - 46
          * Test getDBQuoted() for correct return value
          */
         $this->assertEquals(
@@ -55,7 +46,7 @@ class TestDetails extends \PHPUnit\Framework\TestCase
         
         
         /** -------------------------------------------------------------------------------------------
-         * UT - 56
+         * UT - 47
          * Test getArraySQL() for correct return value
          */
         $this->assertEquals(
@@ -70,7 +61,7 @@ class TestDetails extends \PHPUnit\Framework\TestCase
 
 
         /** -------------------------------------------------------------------------------------------
-         * UT - 57
+         * UT - 48
          * Test tableExists() for True/False
          */
         $this->assertTrue($oDB->tableExists('table1'));
@@ -79,7 +70,7 @@ class TestDetails extends \PHPUnit\Framework\TestCase
 
 
         /** -------------------------------------------------------------------------------------------
-         * UT - 58
+         * UT - 50
          * Test getAssoc() for True condition
          */
 
@@ -96,7 +87,7 @@ class TestDetails extends \PHPUnit\Framework\TestCase
 
 
         /** -------------------------------------------------------------------------------------------
-         * UT - 60
+         * UT - 51
          * Test getRow() for True condition
          */
         $this->assertEquals(
@@ -112,7 +103,7 @@ class TestDetails extends \PHPUnit\Framework\TestCase
 
 
         /** -------------------------------------------------------------------------------------------
-         * UT - 62
+         * UT - 53
          * Test getCol() for True condition
          */
         $this->assertEquals(
@@ -127,7 +118,7 @@ class TestDetails extends \PHPUnit\Framework\TestCase
 
 
         /** -------------------------------------------------------------------------------------------
-         * UT - 64
+         * UT - 55
          * Test getOne() for True condition
          * 
          */
@@ -144,7 +135,7 @@ class TestDetails extends \PHPUnit\Framework\TestCase
 
 
     /** -------------------------------------------------------------------------------------------
-     * UT - 59
+     * UT - 49
      * Test getAssoc() for Exception
      * 
      */
@@ -173,7 +164,7 @@ class TestDetails extends \PHPUnit\Framework\TestCase
 
 
     /** -------------------------------------------------------------------------------------------
-    * UT - 61
+    * UT - 52
     * Test getRow() for Exception
     */
     public function testGetRowException(){
@@ -201,7 +192,7 @@ class TestDetails extends \PHPUnit\Framework\TestCase
 
 
     /** -------------------------------------------------------------------------------------------
-     * UT - 63
+     * UT - 54
      * Test getCol() for Exception
      * 
      */
@@ -233,7 +224,7 @@ class TestDetails extends \PHPUnit\Framework\TestCase
 
     
     /** -------------------------------------------------------------------------------------------
-     * UT - 65
+     * UT - 56
      * Test getOne() for Exception
      * 
      */

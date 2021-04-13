@@ -8,7 +8,7 @@ require_once(CONST_LibDir.'/Status.php');
 class TestStatus extends \PHPUnit\Framework\TestCase
 {
     /** ---------------------------------------------------------------------------------
-     * UT - 41
+     * UT - 34
      * TESTING status() METHOD
      * 
      * Testing for No Database exception
@@ -25,7 +25,7 @@ class TestStatus extends \PHPUnit\Framework\TestCase
     }
 
     /** ---------------------------------------------------------------------------------
-     * UT - 42
+     * UT - 35
      * TESTING status() METHOD
      * 
      * Testing for Database connection failed exception
@@ -51,7 +51,7 @@ class TestStatus extends \PHPUnit\Framework\TestCase
     }
 
     /** ---------------------------------------------------------------------------------
-     * UT - 43
+     * UT - 36
      * TESTING status() METHOD
      * 
      * Testing for Module failed exception
@@ -74,7 +74,7 @@ class TestStatus extends \PHPUnit\Framework\TestCase
     }
 
     /** ---------------------------------------------------------------------------------
-     * UT - 44
+     * UT - 37
      * TESTING status() METHOD
      * 
      * Testing for Module call failed exception
@@ -95,7 +95,7 @@ class TestStatus extends \PHPUnit\Framework\TestCase
 
     
     /** ---------------------------------------------------------------------------------
-     * UT - 45
+     * UT - 38
      * TESTING status() METHOD
      * 
      * Testing for Query Failed exception
@@ -119,7 +119,7 @@ class TestStatus extends \PHPUnit\Framework\TestCase
     }
 
     /** ---------------------------------------------------------------------------------
-     * UT - 46
+     * UT - 39
      * TESTING status() METHOD
      * 
      * Testing for No Value exception
@@ -145,7 +145,7 @@ class TestStatus extends \PHPUnit\Framework\TestCase
     }
 
     /** ---------------------------------------------------------------------------------
-     * UT - 47
+     * UT - 40
      * TESTING status() METHOD
      * 
      * Testing if correct status is returned
@@ -171,7 +171,7 @@ class TestStatus extends \PHPUnit\Framework\TestCase
 
 
     /** ---------------------------------------------------------------------------------
-     * UT - 50
+     * UT - 41
      * TESTING dataDate() METHOD
      * 
      * Testing for Data date query failed exception 
@@ -194,7 +194,7 @@ class TestStatus extends \PHPUnit\Framework\TestCase
 
 
     /** ---------------------------------------------------------------------------------
-     * UT - 51
+     * UT - 42
      * TESTING dataDate() METHOD
      * 
      * Testing if correct data date is returned
@@ -214,7 +214,7 @@ class TestStatus extends \PHPUnit\Framework\TestCase
 
 
     /** ---------------------------------------------------------------------------------
-     * UT - 52
+     * UT - 43
      * TESTING databaseVersion() METHOD
      * 
      * Testing if correct database version date is returned
